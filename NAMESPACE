@@ -1,0 +1,13 @@
+import(sp)
+import(rgdal)
+import(raster)
+import(RCurl)
+import(XML)
+import(zoo)
+
+export(Data60UKCatalogue)
+export(Data60UKDailyTS)
+export(GRDCCatalogue)
+export(GRDCMonthlyTS)
+export(KGClimateClass)
+export(TRMM)
