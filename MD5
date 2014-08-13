@@ -1,9 +1,8 @@
-77f3295b927de3223ade7f23f6d5fc58 *DESCRIPTION
-774a4fba6d47b153ae51595ac4b6d06f *NAMESPACE
+c902892d1fd8048976ca9cc3681df80b *DESCRIPTION
+694ccf5900b978f7bb2109271eaffa5a *NAMESPACE
 ebdab164b43d0cb2ff272f54a75e719e *R/Data60UKCatalogue.R
 31aa26616aea9d5ab8c6cb51aac7207a *R/GRDC.R
 6b567e55cbfadb6024ce6d0353f30317 *R/KGClimateClass.R
-4210f50b13516b0e120cec6f1a306fc5 *R/TRMM.R
 b509b645a833036b4071a9eec26b61af *R/hddtools-package.r
 7999e4f03a09e394bc68babf8140f004 *inst/GRDC/GRDC_LTMMD.csv
 ab86ca5726bb8d40c3f9a5e09709e09f *inst/GRDC/GRDC_Stations_20140320.csv
@@ -13,12 +12,9 @@ d14bd4d1a8ffb7256fb4bd3fa8f92b44 *inst/KOTTEK_Legend.txt
 57b2ec70421bd5e34bef59fc5558d2d5 *inst/PEEL_KG.tar.gz
 0c415b80df3f34afddec251a80377229 *inst/PEEL_Legend.txt
 cef631f757eb90e81e0cc3d1b308cd03 *inst/stationSummary.rda
-5f9ff91f1e99bad2de01e92a3ed6703f *inst/test.txt
-8ba8d50ba6b991c76e5485fda609f2f3 *inst/trmm.sh
 d5fadcb5d62687edaddf305af37e41e4 *man/Data60UKCatalogue.Rd
 4172a585269497248ee68da166bdafbe *man/Data60UKDailyTS.Rd
 af262ac898b494a12b098540b0492d84 *man/GRDCCatalogue.Rd
 fa942c3873eda6462a9f640ce6395d38 *man/GRDCMonthlyTS.Rd
 6aa96b82a2ae1e798ce441ef9d8aa58b *man/Hydrological-Data-Discovery-Tools.Rd
 42eebc87134acf8f9f8c964accd57c48 *man/KGClimateClass.Rd
-4b48cfbc076a065c4fbd052a765320cc *man/TRMM.Rd
