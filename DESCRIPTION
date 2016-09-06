@@ -1,25 +1,20 @@
 Package: hddtools
 Type: Package
-Version: 0.2.4
-Date: 2014-11-21
 Title: Hydrological Data Discovery Tools
-Description: Facilitates discovery and handling of hydrological data,
-    non-programmatic access to catalogues and databases.
-Authors@R: c(person("Claudia", "Vitolo", role = c("aut", "cre"),
-    email = "cvitolodev@gmail.com"),
-    person("Simon", "Moulds", role = "aut",
-    email = "simonmdev@riseup.net"))
-Author: Claudia Vitolo [aut, cre], Simon Moulds [aut]
+Version: 0.3.0
+Date: 2016-09-05
+Authors@R: c(person("Claudia", "Vitolo", email = "cvitolodev@gmail.com", role = c("aut", "cre")))
 Maintainer: Claudia Vitolo <cvitolodev@gmail.com>
-URL: http://cvitolo.github.io/r_hddtools/
-BugReports: https://github.com/cvitolo/r_hddtools/issues
+URL: https://github.com/cvitolo/hddtools/
+BugReports: https://github.com/cvitolo/hddtools/issues
+Description: Facilitates discovery and handling of hydrological data, non-programmatic access to catalogues and databases.
 Depends: R (>= 3.0.2)
-Imports: sp, rgdal, raster, RCurl, XML, zoo
+Imports: zoo, sp, RCurl, XML, rnrfa, Hmisc, raster, stringr
+Suggests: testthat
 License: GPL-3
-LazyData: true
 Repository: CRAN
-Keywords: hydrology, hydrological modelling, hydrologic modeling, time
-        series, environmental data, web technologies and services
-Packaged: 2015-01-17 18:23:35 UTC; claudia
+RoxygenNote: 5.0.1
 NeedsCompilation: no
-Date/Publication: 2015-01-18 06:44:12
+Packaged: 2016-09-06 06:19:20 UTC; claudia
+Author: Claudia Vitolo [aut, cre]
+Date/Publication: 2016-09-06 10:04:41
