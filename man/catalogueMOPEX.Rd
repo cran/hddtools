@@ -2,20 +2,40 @@
 % Please edit documentation in R/MOPEX.R
 \name{catalogueMOPEX}
 \alias{catalogueMOPEX}
-\title{Interface for the MOPEX database catalogue}
+\title{Data source: MOPEX catalogue}
 \usage{
-catalogueMOPEX()
+catalogueMOPEX(areaBox = NULL, columnName = NULL, columnValue = NULL,
+  useCachedData = TRUE)
+}
+\arguments{
+\item{areaBox}{bounding box, a list made of 4 elements: minimum longitude (lonMin), minimum latitude (latMin), maximum longitude (lonMax), maximum latitude (latMax)}
+
+\item{columnName}{name of the column to filter}
+
+\item{columnValue}{value to look for in the column named columnName}
+
+\item{useCachedData}{logical, set to TRUE to use cached data, set to FALSE to retrive data from online source. This is TRUE by default.}
 }
 \value{
-This function returns a data frame made of 5 columns: "id" (hydrometric reference number), "name", "location", "Latitude" and "Longitude".
+This function returns a data frame made of 431 rows (gauging stations) and 12 columns containing stations metadata.
 }
 \description{
-This function interfaces the MOPEX database catalogue (available from ftp://hydrology.nws.noaa.gov/pub/gcip/mopex/US_Data/) containing 438 daily datasets.
+This function interfaces the MOPEX database catalogue (available from \url{ftp://hydrology.nws.noaa.gov/pub/gcip/mopex/US_Data/}) containing 438 daily datasets.
 }
 \examples{
 \dontrun{
   # Retrieve the MOPEX catalogue
-  catalogueMOPEX()
+  MOPEX_catalogue_all <- catalogueMOPEX()
+
+  # Define a bounding box
+  areaBox <- raster::extent(-95, -92, 37, 41)
+  # Filter the catalogue based on bounding box
+  MOPEX_catalogue_bbox <- catalogueMOPEX(areaBox = areaBox)
+
+  # Get only catchments within NC
+  MOPEX_catalogue_state <- catalogueMOPEX(columnName = "state",
+                                          columnValue = "NC")
+
 }
 
 }

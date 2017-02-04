@@ -11,7 +11,7 @@
 #' @examples
 #' \dontrun{
 #'   # Retrieve the full dataset (list of 11 time series)
-#'   x <- HadDAILY()
+#'   HadDAILY_all <- HadDAILY()
 #'   plot(x$EWP) # time series for England and Wales
 #' }
 #'
@@ -39,8 +39,8 @@ HadDAILY <- function(){
 
     regionCOUNTER <- regionCOUNTER + 1
 
-    fullURL <- paste(baseURL, region, "_daily_qc.txt", sep="")
-    tmp <- read.table(fullURL, skip = 3, header = F)
+    fullURL <- paste(baseURL, region, "_daily_qc.txt", sep = "")
+    tmp <- read.table(fullURL, skip = 3, header = FALSE)
 
     # create empty time series
     dataSTART <- as.Date(paste(tmp[1,1], "-", tmp[1,2], "-", "01", sep = ""))

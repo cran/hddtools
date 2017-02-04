@@ -3,7 +3,7 @@
 \docType{data}
 \name{SEPAcatalogue}
 \alias{SEPAcatalogue}
-\title{SEPAcatalogue}
+\title{Data set: The SEPA Catalogue}
 \format{A data frame with 830 observations on the following 8 variables.
 \describe{
   \item{\code{idNRFA}}{National River Flow Archive id number.}
@@ -13,7 +13,7 @@
   \item{\code{Location}}{String describing the location.}
   \item{\code{GridRef}}{British National Grid Reference.}
   \item{\code{Operator}}{The operator's name.}
-  \item{\code{CatchmentArea(km2)}}{Area of the catchment.}
+  \item{\code{CatchmentAreaKm2}}{Area of the catchment.}
 }}
 \source{
 \url{http://pennine.ddns.me.uk/riverlevels/ConciseList.html}

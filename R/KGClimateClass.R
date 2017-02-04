@@ -4,11 +4,11 @@
 #'
 #' @description Given a bounding box, the function identifies the overlapping climate zones.
 #'
-#' @param bbox bounding box, a list made of 4 elements: minimum longitude (lonMin), minimum latitude (latMin), maximum longitude (lonMax), maximum latitude (latMax)
-#' @param updatedBy this can either be Kottek
+#' @param areaBox bounding box, a list made of 4 elements: minimum longitude (lonMin), minimum latitude (latMin), maximum longitude (lonMax), maximum latitude (latMax)
+#' @param updatedBy this can either be "Kottek" or "Peel"
 #' @param verbose if TRUE more info are printed on the screen
 #'
-#' @references Kottek et al. (2006): http://koeppen-geiger.vu-wien.ac.at/. Peel et al. (2007): http://people.eng.unimelb.edu.au/mpeel/koppen.html.
+#' @references Kottek et al. (2006): \url{http://koeppen-geiger.vu-wien.ac.at/}. Peel et al. (2007): \url{http://people.eng.unimelb.edu.au/mpeel/koppen.html}.
 #'
 #' @return List of overlapping climate zones.
 #'
@@ -17,25 +17,27 @@
 #' @examples
 #' \dontrun{
 #'   # Define a bounding box
-#'   bbox <- list(lonMin=-3.82,latMin=52.41,lonMax=-3.63,latMax=52.52)
+#'   areaBox <- raster::extent(-3.82, -3.63, 52.41, 52.52)
 #'   # Get climate classes
-#'   KGClimateClass(bbox)
+#'   KGClimateClass(areaBox = areaBox)
 #' }
 #'
 
-KGClimateClass <- function(bbox=NULL,updatedBy="Peel",verbose=FALSE){
+KGClimateClass <- function(areaBox = NULL, updatedBy = "Peel", verbose = FALSE){
 
   # crop to bounding box
-  if (is.null(bbox)){
-    bbox <- list(lonMin=-180,latMin=-90,lonMax=+180,latMax=+90)
+
+  if (is.null(areaBox)){
+    areaBox <- raster::extent(c(-180, +180, -90, +90))
   }
-  bbSP <- bboxSpatialPolygon(bbox)
+  bbSP <- bboxSpatialPolygon(areaBox)
 
   if (updatedBy == "Kottek") {
 
     # MAP UPDATED BY KOTTEK
-    kgLegend <- read.table(system.file("extdata/KOTTEK_Legend.txt",
-                                       package = 'hddtools'))
+    kgLegend <- read.table(system.file(file.path("extdata",
+                                                 "KOTTEK_Legend.txt"),
+                                       package = "hddtools"))
 
     # message("OFFLINE results")
 
@@ -43,17 +45,18 @@ KGClimateClass <- function(bbox=NULL,updatedBy="Peel",verbose=FALSE){
     td <- tempdir()
 
     # create the placeholder file
-    tf <- tempfile(tmpdir=td, fileext=".tar.gz")
+    tf <- tempfile(tmpdir = td, fileext = ".tar.gz")
 
-    untar(system.file("extdata/KOTTEK_KG.tar.gz",
-                      package = 'hddtools'), exdir = td)
+    untar(system.file(file.path("extdata", "KOTTEK_KG.tar.gz"),
+                      package = "hddtools"), exdir = td)
 
-    kgRaster <- raster::raster(paste(td,"/KOTTEK_koeppen-geiger.tiff",sep=""))
+    kgRaster <- raster::raster(paste0(td, "/KOTTEK_koeppen-geiger.tiff",
+                                      sep = ""))
 
-    temp <- data.frame(table(raster::extract(kgRaster,bbSP)))
+    temp <- data.frame(table(raster::extract(kgRaster, bbSP)))
     temp$Class <- NA
     for (i in 1:dim(temp)[1]){
-      class1 <- which(kgLegend[,1]==temp[i,1])
+      class1 <- which(kgLegend[,1] == temp[i,1])
       if (length(class1) > 0){
         temp$Class[i] <- as.character(kgLegend[class1,3])
       }
@@ -70,8 +73,8 @@ KGClimateClass <- function(bbox=NULL,updatedBy="Peel",verbose=FALSE){
   if (updatedBy == "Peel") {
 
     # MAP UPDATED BY PEEL
-    kgLegend <- read.table(system.file("extdata/PEEL_Legend.txt",
-                                       package = 'hddtools'),
+    kgLegend <- read.table(system.file(file.path("extdata", "PEEL_Legend.txt"),
+                                       package = "hddtools"),
                            header=TRUE)
 
     # message("OFFLINE results")
@@ -80,17 +83,17 @@ KGClimateClass <- function(bbox=NULL,updatedBy="Peel",verbose=FALSE){
     td <- tempdir()
 
     # create the placeholder file
-    tf <- tempfile(tmpdir=td, fileext=".tar.gz")
+    tf <- tempfile(tmpdir = td, fileext = ".tar.gz")
 
-    untar(system.file("extdata/PEEL_KG.tar.gz",
-                      package = 'hddtools'), exdir = td)
+    untar(system.file(file.path("extdata", "PEEL_KG.tar.gz"),
+                      package = "hddtools"), exdir = td)
 
-    kgRaster <- raster::raster(paste(td,"/PEEL_koppen_ascii.txt",sep=""))
+    kgRaster <- raster::raster(paste0(td, "/PEEL_koppen_ascii.txt", sep = ""))
 
-    temp <- data.frame(table(raster::extract(kgRaster,bbSP)))
+    temp <- data.frame(table(raster::extract(kgRaster, bbSP)))
     temp$Class <- NA
     for (i in 1:dim(temp)[1]){
-      class1 <- which(kgLegend[,1]==temp[i,1])
+      class1 <- which(kgLegend[,1] == temp[i,1])
       if (length(class1) > 0){
         temp$Class[i] <- as.character(kgLegend[class1,2])
       }
@@ -108,128 +111,169 @@ KGClimateClass <- function(bbox=NULL,updatedBy="Peel",verbose=FALSE){
   secondPart <- substr(temp$Class,2,2)
   thirdPart <- substr(temp$Class,3,3)
 
-  if (firstPart == "A"){
+  description <- vector(mode="character", length=max(length(firstPart),
+                                                           length(secondPart),
+                                                           length(thirdPart)))
 
-    description <- "A = Equatorial climates"
-    criterion <- "A = Tmin >= +18 C"
+  criterion <- vector(mode="character", length=max(length(firstPart),
+                                                         length(secondPart),
+                                                         length(thirdPart)))
 
-    if (secondPart == "f"){
-      description <- paste(description,"\nf = Equatorial rainforest, fully humid")
-      criterion <- paste(criterion,"\nf = Pmin >= 60mm")
-    }
-    if (secondPart == "m"){
-      description <- paste(description,"\nm = Equatorial monsoon")
-      criterion <- paste(criterion,"\nm = Pann >= 25*(100 - Pmin)")
-    }
-    if (secondPart == "s"){
-      description <- paste(description,"\ns = Equatorial savannah with dry summer")
-      criterion <- paste(criterion,"\ns = Pmin < 60mm in summer")
-    }
-    if (secondPart == "w"){
-      description <- paste(description,"\nw = Equatorial savannah with dry winter")
-      criterion <- paste(criterion,"\nw = Pmin < 60mm in winter")
-    }
-  }
 
-  if (firstPart == "B"){
+  for (j in 1:length(description)){
 
-    description <- "B = Arid climates"
-    criterion <- "B = Pann < 10 Pth"
+    if (firstPart[j] == "A"){
 
-    if (secondPart == "S"){
-      description <- paste(description,"\nS = Steppe climate")
-      criterion <- paste(criterion,"\nS = Pann > 5 Pth")
-    }
-    if (secondPart == "W"){
-      description <- paste(description,"\nW = Desert climate")
-      criterion <- paste(criterion,"\nW = Pann <= 5 Pth")
-    }
-  }
+      description[j] <- "A = Equatorial climates"
+      criterion[j] <- "A = Tmin >= +18 C"
 
-  if (firstPart == "C"){
+      if (secondPart[j] == "f"){
+        description[j] <- paste0(description[j],
+                                 "; f = Equatorial rainforest, fully humid")
+        criterion[j] <- paste0(criterion[j],"; f = Pmin >= 60mm")
+      }
+      if (secondPart[j] == "m"){
+        description[j] <- paste0(description[j], "; m = Equatorial monsoon")
+        criterion[j] <- paste0(criterion[j], "; m = Pann >= 25*(100 - Pmin)")
+      }
+      if (secondPart[j] == "s"){
+        description[j] <- paste0(description[j],
+                                 "; s = Equatorial savannah with dry summer")
+        criterion[j] <- paste0(criterion[j], "; s = Pmin < 60mm in summer")
+      }
+      if (secondPart[j] == "w"){
+        description[j] <- paste0(description[j],
+                                 "; w = Equatorial savannah with dry winter")
+        criterion[j] <- paste0(criterion[j], "; w = Pmin < 60mm in winter")
+      }
+    }
 
-    description <- "C = Warm temperate climates"
-    criterion <- "C = -3 C < Tmin < +18 C"
+    if (firstPart[j] == "B"){
 
-    if (secondPart == "s"){
-      description <- paste(description,"\ns = Warm temperate climate with dry summer")
-      criterion <- paste(criterion,"\ns = Psmin < Pwmin , Pwmax > 3 Psmin and Psmin < 40mm")
-    }
-    if (secondPart == "w"){
-      description <- paste(description,"\nw = Warm temperate climate with dry winter")
-      criterion <- paste(criterion,"\nw = Pwmin < Psmin and Psmax > 10 Pwmin")
-    }
-    if (secondPart == "f"){
-      description <- paste(description,"\nf = Warm temperate climate, fully humid")
-      criterion <- paste(criterion,"\nf = neither Cs nor Cw","\n(Cs's criterion: Psmin < Pwmin , Pwmax > 3 Psmin and Psmin < 40mm. \nCw's criterion: Pwmin < Psmin and Psmax > 10 Pwmin.)")
-    }
-  }
-  if (firstPart == "D"){
+      description[j] <- "B = Arid climates"
+      criterion[j] <- "B = Pann < 10 Pth"
 
-    description <- "D = Snow climates"
-    criterion <- "D = Tmin <= -3 C"
+      if (secondPart[j] == "S"){
+        description[j] <- paste0(description[j], "; S = Steppe climate")
+        criterion[j] <- paste0(criterion[j], "; S = Pann > 5 Pth")
+      }
+      if (secondPart[j] == "W"){
+        description[j] <- paste0(description[j], "; W = Desert climate")
+        criterion[j] <- paste0(criterion[j], "; W = Pann <= 5 Pth")
+      }
+    }
 
-    if (secondPart == "s"){
-      description <- paste(description,"\ns = Snow climate with dry summer")
-      criterion <- paste(criterion,"\ns = Psmin < Pwmin , Pwmax > 3 Psmin and Psmin < 40mm")
-    }
-    if (secondPart == "w"){
-      description <- paste(description,"\nw = Snow climate with dry winter")
-      criterion <- paste(criterion,"\nw = Pwmin < Psmin and Psmax > 10 Pwmin")
-    }
-    if (secondPart == "f"){
-      description <- paste(description,"\nf = Snow climate, fully humid")
-      criterion <- paste(criterion,"\nf = neither Ds nor Dw","\n(Ds's criterion: Psmin < Pwmin , Pwmax > 3 Psmin and Psmin < 40mm. \nDw's criterion: Pwmin < Psmin and Psmax > 10 Pwmin.)")
-    }
-  }
-  if (firstPart == "E"){
+    if (firstPart[j] == "C"){
 
-    description <- "E = Polar climates"
-    criterion <- "E = Tmax < +10 C"
+      description[j] <- "C = Warm temperate climates"
+      criterion[j] <- "C = -3 C < Tmin < +18 C"
 
-    if (secondPart == "T"){
-      description <- paste(description,"\nT = Tundra climate")
-      criterion <- paste(criterion,"\nT = 0 C <= Tmax < +10 C")
+      if (secondPart[j] == "s"){
+        description[j] <- paste0(description[j],
+                                 "; s = Warm temperate climate with dry summer")
+        criterion[j] <- paste0(criterion[j],
+                               "; s = Psmin < Pwmin , Pwmax > 3",
+                               "Psmin and Psmin < 40mm")
+      }
+      if (secondPart[j] == "w"){
+        description[j] <- paste0(description[j],
+                                 "; w = Warm temperate climate with dry winter")
+        criterion[j] <- paste0(criterion[j],
+                               "; w = Pwmin < Psmin and Psmax > 10 Pwmin")
+      }
+      if (secondPart[j] == "f"){
+        description[j] <- paste0(description[j],
+                                 "; f = Warm temperate climate, fully humid")
+        criterion[j] <- paste0(criterion[j],
+                               "; f = neither Cs nor Cw",
+                               "; (Cs's criterion: Psmin <",
+                               "Pwmin, Pwmax > 3 Psmin and Psmin < 40mm.; Cw's",
+                               "criterion: Pwmin < Psmin and Psmax >10 Pwmin.)")
+      }
     }
-    if (secondPart == "F"){
-      description <- paste(description,"\nF = Frost climate")
-      criterion <- paste(criterion,"\nF = Tmax < 0 C")
-    }
-  }
+    if (firstPart[j] == "D"){
 
-  if (thirdPart == "h"){
-    description <- paste(description,"\nh = Hot steppe / desert")
-    criterion <- paste(criterion,"\nh = Tann >= +18 C")
-  }
-  if (thirdPart == "k"){
-    description <- paste(description,"\nk = Cold steppe /desert")
-    criterion <- paste(criterion,"\nk = Tann < +18 C")
-  }
-  if (thirdPart == "a"){
-    description <- paste(description,"\na = Hot summer")
-    criterion <- paste(criterion,"\na = Tmax >= +22 C")
-  }
-  if (thirdPart == "b"){
-    description <- paste(description,"\nb = Warm summer")
-    criterion <- paste(criterion,"\nb = Tmax < +22 C & at least 4 Tmon >= +10 C")
-  }
-  if (thirdPart == "c"){
-    description <- paste(description,"\nc = Cool summer and cold winter")
-    criterion <- paste(criterion,"\nc = Tmax >= +22 C & 4 Tmon < +10 C & Tmin > -38 C")
-  }
-  if (thirdPart == "d"){
-    description <- paste(description,"\nd = Extremely continental")
-    criterion <- paste(criterion,"\nd = Tmax >= +22 C & 4 Tmon < +10 C & Tmin <= -38 C")
+      description[j] <- "D = Snow climates"
+      criterion[j] <- "D = Tmin <= -3 C"
+
+      if (secondPart[j] == "s"){
+        description[j] <- paste0(description[j],
+                                 "; s = Snow climate with dry summer")
+        criterion[j] <- paste0(criterion[j],
+                               "; s = Psmin < Pwmin , Pwmax > 3",
+                                     "Psmin and Psmin < 40mm")
+      }
+      if (secondPart[j] == "w"){
+        description[j] <- paste0(description[j],
+                                 "; w = Snow climate with dry winter")
+        criterion[j] <- paste0(criterion[j],
+                               "; w = Pwmin < Psmin and Psmax > 10 Pwmin")
+      }
+      if (secondPart[j] == "f"){
+        description[j] <- paste0(description[j],
+                                 "; f = Snow climate, fully humid")
+        criterion[j] <- paste0(criterion[j],
+                               "; f = neither Ds nor Dw","; (Ds's",
+                               "criterion: Psmin < Pwmin , Pwmax > 3 Psmin and",
+                               "Psmin < 40mm.;",
+                               "Dw's criterion: Pwmin < Psmin and",
+                               "Psmax > 10 Pwmin.)")
+      }
+    }
+    if (firstPart[j] == "E"){
+
+      description[j] <- "E = Polar climates"
+      criterion[j] <- "E = Tmax < +10 C"
+
+      if (secondPart[j] == "T"){
+        description[j] <- paste0(description[j], "; T = Tundra climate")
+        criterion[j] <- paste0(criterion[j], "; T = 0 C <= Tmax < +10 C")
+      }
+      if (secondPart[j] == "F"){
+        description[j] <- paste0(description[j], "; F = Frost climate")
+        criterion[j] <- paste0(criterion[j], "; F = Tmax < 0 C")
+      }
+    }
+
+    if (thirdPart[j] == "h"){
+      description[j] <- paste0(description[j], "; h = Hot steppe / desert")
+      criterion[j] <- paste0(criterion[j], "; h = Tann >= +18 C")
+    }
+    if (thirdPart[j] == "k"){
+      description[j] <- paste0(description[j], "; k = Cold steppe /desert")
+      criterion[j] <- paste0(criterion[j], "; k = Tann < +18 C")
+    }
+    if (thirdPart[j] == "a"){
+      description[j] <- paste0(description[j], "; a = Hot summer")
+      criterion[j] <- paste0(criterion[j], "; a = Tmax >= +22 C")
+    }
+    if (thirdPart[j] == "b"){
+      description[j] <- paste0(description[j], "; b = Warm summer")
+      criterion[j] <- paste0(criterion[j],
+                             "; b = Tmax < +22 C & at least 4 Tmon >= +10 C")
+    }
+    if (thirdPart[j] == "c"){
+      description[j] <- paste0(description[j],
+                               "; c = Cool summer and cold winter")
+      criterion[j] <- paste0(criterion[j], "; c = Tmax >= +22 C ",
+                             "& 4 Tmon < +10 C & Tmin > -38 C")
+    }
+    if (thirdPart[j] == "d"){
+      description[j] <- paste0(description[j], "; d = Extremely continental")
+      criterion[j] <- paste0(criterion[j], "; d = Tmax >= +22 C ",
+                             "& 4 Tmon < +10 C & Tmin <= -38 C")
+    }
+
   }
 
   if ( verbose == TRUE ){
 
-    message("Class:")
-    message(temp$Class)
+    message("Class(es):")
+    print(temp$Class)
     message("Description:")
-    message(description)
+    print(description)
     message("Criterion:")
-    message(criterion)
+    print(criterion)
 
   }
 

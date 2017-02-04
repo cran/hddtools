@@ -7,7 +7,7 @@
 tsGRDC(stationID, plotOption = FALSE)
 }
 \arguments{
-\item{stationID}{7 character number that identifies a station, GRDC station number is called "grdc no" in the catalogue.}
+\item{stationID}{7 string that identifies a station, GRDC station number is called "grdc no" in the catalogue.}
 
 \item{plotOption}{boolean to define whether to plot the results. By default this is set to TRUE.}
 }
@@ -31,10 +31,10 @@ The function returns a list of 3 tables: \describe{
 }
 \item{\strong{mddPerMonth}}{This is a table containing mean daily discharges for each month over the entire period (12 records covering max. n years. Calculated only for months with less then or equal to 10 missing days). It is made of 7 columns which description is as follows:}\itemize{
   \item LQ:    lowest monthly discharge of the given month in the entire period
-  \item year:  associated year of occurrence (only the first occurence is listed)
+  \item year:  associated year of occurrence (only the first occurrence is listed)
   \item MQ:    mean discharge from all monthly discharges of the given month in the entire period
   \item HQ:    highest monthly discharge of the given month in the entire period
-  \item year:  associated year of occurrence (only the first occurence is listed)
+  \item year:  associated year of occurrence (only the first occurrence is listed)
   \item std:   standard deviation of all monthly discharges of the given month in the entire period
   \item n:     number of available daily values used for computation
 }
@@ -48,7 +48,9 @@ Please note that not all the GRDC stations listed in the catalogue have monthly 
 }
 \examples{
 \dontrun{
-  x <- tsGRDC(stationID=1107700)
+  Adaitu <- tsGRDC(stationID = "1577602")
+  Adaitu <- tsGRDC(stationID = catalogueGRDC()$grdc_no[1000],
+                   plotOption = TRUE)
 }
 
 }

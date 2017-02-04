@@ -1,78 +1,126 @@
-#' Interface for the Global Runoff Data Centre database catalogue
+#' Data source: Global Runoff Data Centre catalogue
 #'
 #' @author Claudia Vitolo
 #'
 #' @description This function interfaces the Global Runoff Data Centre database which provides river discharge data for about 9000 sites over 157 countries.
 #'
-#' @param bbox bounding box, a list made of 4 elements: minimum longitude (lonMin), minimum latitude (latMin), maximum longitude (lonMax), maximum latitude (latMax)
-#' @param stationID Station ID number, it should be in the range [1104150,6990700]
+#' @param areaBox bounding box, a list made of 4 elements: minimum longitude (lonMin), minimum latitude (latMin), maximum longitude (lonMax), maximum latitude (latMax)
+#' @param columnName name of the column to filter
+#' @param columnValue value to look for in the column named columnName
 #' @param mdDescription boolean value. Default is FALSE (no description is printed)
-#' @param metadataColumn name of the column to filter
-#' @param entryValue value to look for in the column named metadataColumn
+#' @param useCachedData logical, set to TRUE to use cached data, set to FALSE to retrive data from online source. This is TRUE by default.
 #'
-#' @return list of stations within the bounding box
+#' @return This function returns a data frame made of 8966 rows (gauging stations, as per October 2016) and 44 columns containing metadata.
 #'
 #' @export
 #'
 #' @examples
 #' \dontrun{
 #'   # Retrieve the whole catalogue
-#'   catalogueGRDC()
+#'   GRDC_catalogue_all <- catalogueGRDC()
 #'
 #'   # Define a bounding box
-#'   bbox <- list(lonMin=-3.82,latMin=52.41,lonMax=-3.63,latMax=52.52)
+#'   areaBox <- raster::extent(-3.82, -3.63, 52.41, 52.52)
+#'   # Filter the catalogue based on bounding box
+#'   GRDC_catalogue_bbox <- catalogueGRDC(areaBox = areaBox)
 #'
-#'   # Filter the catalogue
-#'   catalogueGRDC(bbox)
+#'   # Get only catchments with area above 5000 Km2
+#'   GRDC_catalogue_area <- catalogueGRDC(columnName = "area",
+#'                                        columnValue = ">= 5000")
+#'
+#'   # Get only catchments within river Thames
+#'   GRDC_catalogue_river <- catalogueGRDC(columnName = "river",
+#'                                         columnValue = "Thames")
 #' }
 #'
 
-catalogueGRDC <- function(bbox = NULL, stationID = NULL,
-                           metadataColumn=NULL, entryValue=NULL,
-                           mdDescription=FALSE){
+catalogueGRDC <- function(areaBox = NULL,
+                          columnName = NULL, columnValue = NULL,
+                          mdDescription = FALSE, useCachedData = TRUE){
 
-  # Retrieve the catalogue
-  temp <- system.file("extdata/GRDC/GRDC_Stations_20140320.csv",
-                      package = 'hddtools')
-  grdcAll <- read.csv(temp,sep=",")
+  theurl <- paste0("http://www.bafg.de/GRDC/EN/02_srvcs/21_tmsrs/211_ctlgs/",
+                   "GRDC_Stations.zip?__blob=publicationFile")
 
-  if (!is.null(stationID)) {
-    grdcSelected <- subset(grdcAll, (grdcAll$grdc_no==stationID) )
+  if (useCachedData == TRUE | RCurl::url.exists(theurl) == FALSE){
+
+    # message("Using cached data.")
+
+    load(system.file(file.path("data", "GRDCcatalogue.rda"),
+                     package = "hddtools"))
+
   }else{
-    grdcSelected <- grdcAll
+
+    message("Retrieving data from data provider.")
+
+    # Retrieve the catalogue
+    temp <- tempfile()
+    download.file(theurl,temp)
+    fileLocation <- utils::unzip(zipfile = temp, exdir = dirname(temp))
+    GRDCcatalogue <- gdata::read.xls(fileLocation, sheet = "grdc_metadata")
+    unlink(temp)
+    GRDCcatalogue[] <- lapply(GRDCcatalogue, as.character)
+    GRDCcatalogue$lat <- as.numeric(GRDCcatalogue$lat)
+    GRDCcatalogue$long <- as.numeric(GRDCcatalogue$long)
+    GRDCcatalogue$area <- as.numeric(GRDCcatalogue$area)
+    GRDCcatalogue$altitude <- as.numeric(GRDCcatalogue$altitude)
+    GRDCcatalogue$d_start <- as.numeric(GRDCcatalogue$d_start)
+    GRDCcatalogue$d_end <- as.numeric(GRDCcatalogue$d_end)
+    GRDCcatalogue$d_yrs <- as.numeric(GRDCcatalogue$d_yrs)
+    GRDCcatalogue$d_miss <- as.numeric(GRDCcatalogue$d_miss)
+    GRDCcatalogue$m_start <- as.numeric(GRDCcatalogue$m_start)
+    GRDCcatalogue$m_end <- as.numeric(GRDCcatalogue$m_end)
+    GRDCcatalogue$m_yrs <- as.numeric(GRDCcatalogue$m_yrs)
+    GRDCcatalogue$m_miss <- as.numeric(GRDCcatalogue$m_miss)
+    GRDCcatalogue$t_start <- as.numeric(GRDCcatalogue$t_start)
+    GRDCcatalogue$t_end <- as.numeric(GRDCcatalogue$t_end)
+    GRDCcatalogue$t_yrs <- as.numeric(GRDCcatalogue$t_yrs)
+    GRDCcatalogue$lta_discharge <- as.numeric(GRDCcatalogue$lta_discharge)
+    GRDCcatalogue$r_volume_yr <- as.numeric(GRDCcatalogue$r_volume_yr)
+    GRDCcatalogue$r_height_yr <- as.numeric(GRDCcatalogue$r_height_yr)
+    GRDCcatalogue$proc_tyrs <- as.numeric(GRDCcatalogue$proc_tyrs)
+    GRDCcatalogue$proc_tmon <- as.numeric(GRDCcatalogue$proc_tmon)
+
   }
 
-  if (!is.null(bbox)){
-
-    lonMin <- bbox$lonMin
-    lonMax <- bbox$lonMax
-    latMin <- bbox$latMin
-    latMax <- bbox$latMax
-
+  if (!is.null(areaBox)){
+    lonMin <- areaBox@xmin
+    lonMax <- areaBox@xmax
+    latMin <- areaBox@ymin
+    latMax <- areaBox@ymax
   }else{
-
     lonMin <- -180
     lonMax <- +180
     latMin <- -90
     latMax <- +90
-
   }
 
-  grdcSelectedBB <- subset(grdcSelected, (grdcSelected$lat <= latMax &
-                                            grdcSelected$lat >= latMin &
-                                            grdcSelected$lon <= lonMax &
-                                            grdcSelected$lon >= lonMin) )
+  grdcSelectedBB <- subset(GRDCcatalogue, (GRDCcatalogue$lat <= latMax &
+                                            GRDCcatalogue$lat >= latMin &
+                                            GRDCcatalogue$lon <= lonMax &
+                                            GRDCcatalogue$lon >= lonMin) )
 
-  if ( !is.null(metadataColumn) & !is.null(entryValue) ){
+  if ( !is.null(columnName) & !is.null(columnValue) ){
 
-    if (metadataColumn %in% names(grdcSelectedBB)){
+    if (tolower(columnName) %in% tolower(names(grdcSelectedBB))){
 
-      grdcTable <- grdcSelectedBB[which(grdcSelectedBB[,metadataColumn] ==
-                                          entryValue),]
+      col2select <- which(tolower(names(grdcSelectedBB)) ==
+                            tolower(columnName))
+
+      if (class(grdcSelectedBB[,col2select]) == "character"){
+        rows2select <- which(tolower(grdcSelectedBB[,col2select]) ==
+                               tolower(columnValue))
+      }
+      if (class(grdcSelectedBB[,col2select]) == "numeric"){
+        # rows2select <- which(grdcSelectedBB[,col2select] == columnValue)
+        rows2select <- eval(parse(text =
+                                    paste0("which(grdcSelectedBB[,col2select] ",
+                                           columnValue, ")")))
+      }
+      grdcTable <- grdcSelectedBB[rows2select,]
 
     }else{
 
-      message("metadataColumn should be one of the columns of the catalogue")
+      message("columnName should be one of the columns of the catalogue")
 
     }
 
@@ -83,15 +131,12 @@ catalogueGRDC <- function(bbox = NULL, stationID = NULL,
   }
 
   row.names(grdcTable) <- NULL
-  names(grdcTable)[5] <- "id"
-  names(grdcTable)[7] <- "name"
-  names(grdcTable)[9]  <- "Latitude"
-  names(grdcTable)[10] <- "Longitude"
 
-  if (mdDescription==TRUE){
+  if (mdDescription == TRUE){
 
-    temp <- system.file("extdata/GRDC/GRDC_legend.csv", package = 'hddtools')
-    grdcLegend <- read.csv(temp, header=F)
+    temp <- system.file(file.path("extdata", "GRDC", "GRDC_legend.csv"),
+                        package = "hddtools")
+    grdcLegend <- read.csv(temp, header = FALSE)
 
     grdcTable <- cbind(grdcLegend,t(grdcTable))
     row.names(grdcTable) <- NULL
@@ -109,7 +154,7 @@ catalogueGRDC <- function(bbox = NULL, stationID = NULL,
 #'
 #' @description This function interfaces the Global Runoff Data Centre monthly mean daily discharges database.
 #'
-#' @param stationID 7 character number that identifies a station, GRDC station number is called "grdc no" in the catalogue.
+#' @param stationID 7 string that identifies a station, GRDC station number is called "grdc no" in the catalogue.
 #' @param plotOption boolean to define whether to plot the results. By default this is set to TRUE.
 #'
 #' @return The function returns a list of 3 tables: \describe{
@@ -131,10 +176,10 @@ catalogueGRDC <- function(bbox = NULL, stationID = NULL,
 #' }
 #' \item{\strong{mddPerMonth}}{This is a table containing mean daily discharges for each month over the entire period (12 records covering max. n years. Calculated only for months with less then or equal to 10 missing days). It is made of 7 columns which description is as follows:}\itemize{
 #'   \item LQ:    lowest monthly discharge of the given month in the entire period
-#'   \item year:  associated year of occurrence (only the first occurence is listed)
+#'   \item year:  associated year of occurrence (only the first occurrence is listed)
 #'   \item MQ:    mean discharge from all monthly discharges of the given month in the entire period
 #'   \item HQ:    highest monthly discharge of the given month in the entire period
-#'   \item year:  associated year of occurrence (only the first occurence is listed)
+#'   \item year:  associated year of occurrence (only the first occurrence is listed)
 #'   \item std:   standard deviation of all monthly discharges of the given month in the entire period
 #'   \item n:     number of available daily values used for computation
 #' }
@@ -146,61 +191,70 @@ catalogueGRDC <- function(bbox = NULL, stationID = NULL,
 #'
 #' @examples
 #' \dontrun{
-#'   x <- tsGRDC(stationID=1107700)
+#'   Adaitu <- tsGRDC(stationID = "1577602")
+#'   Adaitu <- tsGRDC(stationID = catalogueGRDC()$grdc_no[1000],
+#'                    plotOption = TRUE)
 #' }
 #'
 
-tsGRDC <- function(stationID, plotOption=FALSE){
+tsGRDC <- function(stationID, plotOption = FALSE){
 
-  options(warn=-1)
+  options(warn = -1)
 
   temp <- catalogueGRDC()
 
-  if ( temp[which(temp$grdc_no==stationID),"statistics"] == 1 ){
+  if ( temp[which(temp$grdc_no == stationID), "statistics"] == 1 ){
+
+    catalogueTmp <- catalogueGRDC(columnName = "grdc_no",
+                                  columnValue = stationID)
 
     # Retrieve look-up table
-    temp <- system.file("extdata/GRDC/GRDC_LTMMD.csv", package = 'hddtools')
-    grdcLTMMD <- read.csv(temp,sep="\t")
+    grdcLTMMD <- NULL
+    load(system.file(file.path("data", "grdcLTMMD.rda"), package = "hddtools"))
 
     # Retrieve WMO region from catalogue
-    wmoRegion <- catalogueGRDC(stationID = stationID)$wmo_reg
+    wmoRegion <- catalogueTmp$wmo_reg
 
     # Retrieve ftp server location
-    zipFile <- as.character(grdcLTMMD[which(grdcLTMMD$WMO.Region==wmoRegion),
+    zipFile <- as.character(grdcLTMMD[which(grdcLTMMD$WMO_Region == wmoRegion),
                                       "Archive"])
 
     # create a temporary directory
     td <- tempdir()
 
     # create the placeholder file
-    tf <- tempfile(tmpdir=td, fileext=".zip")
+    tf <- tempfile(tmpdir = td, fileext = ".zip")
 
     # download into the placeholder file
     download.file(zipFile, tf)
 
     # get the name of the file to unzip
-    fname <- paste("pvm_",stationID,".txt",sep="")
+    fname <- paste("pvm_", stationID, ".txt", sep = "")
 
     # unzip the file to the temporary directory
-    unzip(tf, files=fname, exdir=td, overwrite=TRUE)
+    unzip(tf, files = fname, exdir = td, overwrite = TRUE)
 
     # fpath is the full path to the extracted file
-    fpath = file.path(td, fname)
+    fpath <- file.path(td, fname)
 
     message("Station has monthly records")
 
     TS <- readLines(fpath)
 
-    header1 <- as.numeric(as.character(c(grep("year;LQ;month;MQ;;HQ;month;m",TS))))
+    header1 <- as.numeric(as.character(c(grep("year;LQ;month;MQ;;HQ;month;m",
+                                              TS))))
     header2 <- as.numeric(as.character(c(grep("LQ;MQ_1;MQ_2;MQ_3;HQ;n",TS))))
-    header3 <- as.numeric(as.character(c(grep("month;LQ;year;MQ;HQ;year;std;n",TS))))
+    header3 <- as.numeric(as.character(c(grep("month;LQ;year;MQ;HQ;year;std;n",
+                                              TS))))
     headerTS <- c(header1,header2,header3)
 
-    myTables <- list("mddPerYear"=NULL,"mddAllPeriod"=NULL,"mddPerMonth"=NULL)
+    myTables <- list("mddPerYear" = NULL,
+                     "mddAllPeriod" = NULL,
+                     "mddPerMonth" = NULL)
 
     for (i in 1:3){
       header <- headerTS[i]
-      skipTS <- as.numeric(as.character(grep("#",TS)))
+      skipTS <- as.numeric(as.character(grep("#", TS)))
       skip01 <- 1:header
       rowStart01 <- header + 1
       if ( length(skipTS[which(skipTS > header)]) > 0 ){
@@ -210,13 +264,16 @@ tsGRDC <- function(stationID, plotOption=FALSE){
         rowEnd01 <- length(TS)
       }
       firstTS <- TS[rowStart01:rowEnd01]
-      numberOfCol <- length( unlist( strsplit(TS[rowStart01:rowEnd01],";")[1] ) )
-      numberOfRow <- length( unlist( strsplit(TS[rowStart01:rowEnd01],";") ) ) / numberOfCol
-      m <- matrix( as.numeric(as.character(unlist( strsplit(TS[rowStart01:rowEnd01],";") ) )), ncol=numberOfCol, nrow=numberOfRow, byrow=TRUE)
-      m[m==-999] <- NA
+      numberOfCol <- length(unlist(strsplit(TS[rowStart01:rowEnd01],";")[1]))
+      numberOfRow <- length(unlist(strsplit(TS[rowStart01:rowEnd01],
+                                            ";")))/numberOfCol
+      mtemp <- as.numeric(as.character(unlist(strsplit(TS[rowStart01:rowEnd01],
+                                                       ";"))))
+      m <- matrix(mtemp, ncol = numberOfCol, nrow = numberOfRow, byrow = TRUE)
+      m[m == -999] <- NA
       m <- data.frame(m)
-      n <- unlist(strsplit(TS[header],";"))
-      n <- n[n!=""]
+      n <- unlist(strsplit(TS[header], ";"))
+      n <- n[n != ""]
       names(m) <- n
 
       myTables[[i]] <- m
@@ -231,21 +288,20 @@ tsGRDC <- function(stationID, plotOption=FALSE){
 
       dummyTime <- seq(as.Date("2012-01-01"),
                        as.Date("2012-12-31"),
-                       by="months")
+                       by = "months")
 
-      plot(zoo(table3$MQ, order.by=dummyTime),
-           main=paste("Monthly statistics: ",
-                      catalogueGRDC(stationID = stationID)$name,
-                      " (",catalogueGRDC(stationID = stationID)$country_code,
-                      ")",sep=""),
-           type="l",ylim=c(min(table3$LQ),max(table3$HQ)),
-           xlab="",ylab="m3/s",xaxt = "n")
+      plot(zoo(table3$MQ, order.by = dummyTime),
+           main = paste("Monthly statistics: ",
+                        catalogueTmp$station, " (",
+                        catalogueTmp$country_code, ")", sep=""),
+           type = "l", ylim = c(min(table3$LQ), max(table3$HQ)),
+           xlab = "", ylab = "m3/s", xaxt = "n")
       axis(1, at = dummyTime, labels = format(dummyTime, "%b"))
       polygon(c(dummyTime,rev(dummyTime)), c(table3$HQ,rev(table3$LQ)),
               col = "orange",
               lty = 0,
               lwd = 2)
-      lines(zoo(table3$MQ, order.by=dummyTime), lty=2, lwd=3, col="red")
+      lines(zoo(table3$MQ, order.by = dummyTime), lty = 2, lwd = 3, col = "red")
 
       legend("top", legend = c("Min-Max range", "Mean"),
              bty = "n",

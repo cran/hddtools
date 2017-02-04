@@ -2,24 +2,24 @@
 % Please edit documentation in R/GRDC.R
 \name{catalogueGRDC}
 \alias{catalogueGRDC}
-\title{Interface for the Global Runoff Data Centre database catalogue}
+\title{Data source: Global Runoff Data Centre catalogue}
 \usage{
-catalogueGRDC(bbox = NULL, stationID = NULL, metadataColumn = NULL,
-  entryValue = NULL, mdDescription = FALSE)
+catalogueGRDC(areaBox = NULL, columnName = NULL, columnValue = NULL,
+  mdDescription = FALSE, useCachedData = TRUE)
 }
 \arguments{
-\item{bbox}{bounding box, a list made of 4 elements: minimum longitude (lonMin), minimum latitude (latMin), maximum longitude (lonMax), maximum latitude (latMax)}
+\item{areaBox}{bounding box, a list made of 4 elements: minimum longitude (lonMin), minimum latitude (latMin), maximum longitude (lonMax), maximum latitude (latMax)}
 
-\item{stationID}{Station ID number, it should be in the range [1104150,6990700]}
+\item{columnName}{name of the column to filter}
 
-\item{metadataColumn}{name of the column to filter}
-
-\item{entryValue}{value to look for in the column named metadataColumn}
+\item{columnValue}{value to look for in the column named columnName}
 
 \item{mdDescription}{boolean value. Default is FALSE (no description is printed)}
+
+\item{useCachedData}{logical, set to TRUE to use cached data, set to FALSE to retrive data from online source. This is TRUE by default.}
 }
 \value{
-list of stations within the bounding box
+This function returns a data frame made of 8966 rows (gauging stations, as per October 2016) and 44 columns containing metadata.
 }
 \description{
 This function interfaces the Global Runoff Data Centre database which provides river discharge data for about 9000 sites over 157 countries.
@@ -27,13 +27,20 @@ This function interfaces the Global Runoff Data Centre database which provides r
 \examples{
 \dontrun{
   # Retrieve the whole catalogue
-  catalogueGRDC()
+  GRDC_catalogue_all <- catalogueGRDC()
 
   # Define a bounding box
-  bbox <- list(lonMin=-3.82,latMin=52.41,lonMax=-3.63,latMax=52.52)
+  areaBox <- raster::extent(-3.82, -3.63, 52.41, 52.52)
+  # Filter the catalogue based on bounding box
+  GRDC_catalogue_bbox <- catalogueGRDC(areaBox = areaBox)
 
-  # Filter the catalogue
-  catalogueGRDC(bbox)
+  # Get only catchments with area above 5000 Km2
+  GRDC_catalogue_area <- catalogueGRDC(columnName = "area",
+                                       columnValue = ">= 5000")
+
+  # Get only catchments within river Thames
+  GRDC_catalogue_river <- catalogueGRDC(columnName = "river",
+                                        columnValue = "Thames")
 }
 
 }

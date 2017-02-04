@@ -2,34 +2,38 @@
 % Please edit documentation in R/Data60UK.R
 \name{catalogueData60UK}
 \alias{catalogueData60UK}
-\title{Interface for the Data60UK database catalogue}
+\title{Data source: Data60UK catalogue}
 \usage{
-catalogueData60UK(bbox = NULL, columnName = NULL, columnValue = NULL)
+catalogueData60UK(areaBox = NULL, columnName = NULL, columnValue = NULL,
+  useCachedData = TRUE)
 }
 \arguments{
-\item{bbox}{bounding box, a list made of 4 elements: minimum longitude (lonMin), minimum latitude (latMin), maximum longitude (lonMax), maximum latitude (latMax)}
+\item{areaBox}{bounding box, a list made of 4 elements: minimum longitude (lonMin), minimum latitude (latMin), maximum longitude (lonMax), maximum latitude (latMax)}
 
 \item{columnName}{name of the column to filter}
 
 \item{columnValue}{value to look for in the column named columnName}
+
+\item{useCachedData}{logical, set to TRUE to use cached data, set to FALSE to retrieve data from online source. This is TRUE by default.}
 }
 \value{
-This function returns a data frame made of 5 columns: "id" (hydrometric reference number), "name", "location", "Latitude", "Longitude" and "area".
+This function returns a data frame made of 61 rows (gauging stations) and 6 columns: "id" (hydrometric reference number), "River", "Location", "gridReference", "Latitude", "Longitude".
 }
 \description{
-This function interfaces the Data60UK database catalogue (available from http://www.nwl.ac.uk/ih/nrfa/pub/index.html) containing 61 datasets. Dataset catalogue is available from http://www.nwl.ac.uk/ih/nrfa/pub/data.html.
+This function interfaces the Data60UK database catalogue (available from http://nrfaapps.ceh.ac.uk/datauk60/data.html) containing 61 datasets. Dataset catalogue is available from \url{http://nrfaapps.ceh.ac.uk/datauk60/data.html}.
 }
 \examples{
 \dontrun{
   # Retrieve the whole catalogue
-  catalogueData60UK()
+  Data60UK_catalogue_all <- catalogueData60UK()
 
-  # Define a bounding box
-  bbox <- list(lonMin=-3.82,latMin=52.41,lonMax=-3.63,latMax=52.52)
+  # Filter the catalogue based on a bounding box
+  areaBox <- raster::extent(-4, -2, +52, +53)
+  Data60UK_catalogue_bbox <- catalogueData60UK(areaBox)
 
-  # Filter the catalogue
-  catalogueData60UK(bbox)
-  catalogueData60UK(columnName="id",columnValue="62001")
+  # Filter the catalogue based on an ID
+  Data60UK_catalogue_ID <- catalogueData60UK(columnName = "stationID",
+                                             columnValue = "62001")
 }
 
 }

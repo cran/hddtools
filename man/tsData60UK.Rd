@@ -4,14 +4,14 @@
 \alias{tsData60UK}
 \title{Interface for the Data60UK database of Daily Time Series}
 \usage{
-tsData60UK(hydroRefNumber, plotOption = FALSE, timeExtent = NULL)
+tsData60UK(stationID, plotOption = FALSE, twindow = NULL)
 }
 \arguments{
-\item{hydroRefNumber}{hydrometric reference number}
+\item{stationID}{hydrometric reference number (string)}
 
-\item{plotOption}{boolean to define whether to plot the results. By default this is set to TRUE.}
+\item{plotOption}{boolean to define whether to plot the results. By default this is set to FALSE.}
 
-\item{timeExtent}{is a vector of dates and times for which the data should be retrieved}
+\item{twindow}{is a vector of dates and times for which the data should be retrieved}
 }
 \value{
 The function returns a data frame containing 2 time series (as zoo objects): "P" (precipitation) and "Q" (discharge).
@@ -20,7 +20,11 @@ The function returns a data frame containing 2 time series (as zoo objects): "P"
 This function extract the dataset containing daily rainfall and streamflow discharge at one of the Data60UK locations.
 }
 \examples{
-# tsData60UK(39015)
+\dontrun{
+  stationID <- catalogueData60UK()$stationID[1]
+  Morwick <- tsData60UK(stationID = stationID)
+  Morwick <- tsData60UK(stationID = stationID, plotOption = TRUE)
+}
 
 }
 \author{

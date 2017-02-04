@@ -4,12 +4,12 @@
 \alias{KGClimateClass}
 \title{Function to identify the updated Koppen-Greiger climate zone (on a 0.1 x 0.1 degrees resolution map).}
 \usage{
-KGClimateClass(bbox = NULL, updatedBy = "Peel", verbose = FALSE)
+KGClimateClass(areaBox = NULL, updatedBy = "Peel", verbose = FALSE)
 }
 \arguments{
-\item{bbox}{bounding box, a list made of 4 elements: minimum longitude (lonMin), minimum latitude (latMin), maximum longitude (lonMax), maximum latitude (latMax)}
+\item{areaBox}{bounding box, a list made of 4 elements: minimum longitude (lonMin), minimum latitude (latMin), maximum longitude (lonMax), maximum latitude (latMax)}
 
-\item{updatedBy}{this can either be Kottek}
+\item{updatedBy}{this can either be "Kottek" or "Peel"}
 
 \item{verbose}{if TRUE more info are printed on the screen}
 }
@@ -22,9 +22,9 @@ Given a bounding box, the function identifies the overlapping climate zones.
 \examples{
 \dontrun{
   # Define a bounding box
-  bbox <- list(lonMin=-3.82,latMin=52.41,lonMax=-3.63,latMax=52.52)
+  areaBox <- raster::extent(-3.82, -3.63, 52.41, 52.52)
   # Get climate classes
-  KGClimateClass(bbox)
+  KGClimateClass(areaBox = areaBox)
 }
 
 }
@@ -32,6 +32,6 @@ Given a bounding box, the function identifies the overlapping climate zones.
 Claudia Vitolo
 }
 \references{
-Kottek et al. (2006): http://koeppen-geiger.vu-wien.ac.at/. Peel et al. (2007): http://people.eng.unimelb.edu.au/mpeel/koppen.html.
+Kottek et al. (2006): \url{http://koeppen-geiger.vu-wien.ac.at/}. Peel et al. (2007): \url{http://people.eng.unimelb.edu.au/mpeel/koppen.html}.
 }
 
