@@ -54,15 +54,13 @@ The package contains functions to interact with the data providers listed below.
 
 -   [GRDC](http://www.bafg.de/GRDC/EN/Home/homepage_node.html): The Global Runoff Data Centre (GRDC) provides datasets for all the major rivers in the world.
 
--   [TRMM](http://trmm.gsfc.nasa.gov/): The NASA's Tropical Rainfall Measuring Mission records global historical rainfall estimation in a gridded format since 1998 with a daily temporal resolution and a spatial resolution of 0.25 degrees.
+-   [TRMM](http://trmm.gsfc.nasa.gov/): The NASA's Tropical Rainfall Measuring Mission records global historical rainfall estimation in a gridded format since 1998 with a daily temporal resolution and a spatial resolution of 0.25 degrees. **Please note the TRMM function has been temporarily removed from hddtools v0.7 as the ftp at NASA containing the data has been migrated. A new function is under development and will be avalable at the next release (v0.8).**
 
 -   [Data60UK](http://tdwg.catchment.org/datasets.html): The Data60UK initiative collated datasets of areal precipitation and streamflow discharge across 61 gauging sites in England and Wales (UK).
 
 -   [MOPEX](http://tdwg.catchment.org/datasets.html): This dataset contains historical hydrometeorological data and river basin characteristics for hundreds of river basins in the US.
 
 -   [SEPA](http://apps.sepa.org.uk/waterlevels/): The Scottish Environment Protection Agency (SEPA) provides river level data for hundreds of gauging stations in the UK.
-
--   [HadUKP](http://www.metoffice.gov.uk/hadobs/hadukp/): The Met Office Hadley Centre Observation Data Centre provides daily precipitation time series averaged over UK regions and subregions.
 
 Meta
 ----
