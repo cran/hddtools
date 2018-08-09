@@ -2,11 +2,17 @@ context("tsGRDC")
 
 test_that("Test tsGRDC function", {
 
-  # Retrieve sample data
-  x <- tsGRDC(stationID = 1107700)
+  if (FALSE) {
 
-  expect_that("list" %in% class(x), equals(TRUE))
-  expect_that(all(names(x) == c("mddPerYear", "mddAllPeriod", "mddPerMonth")),
-              equals(TRUE))
+    skip("No internet connection")
+
+    # Retrieve sample data
+    x <- tsGRDC(stationID = "1107700")
+
+    expect_equal("list" %in% class(x), TRUE)
+    expect_equal(all(names(x) == c("LTVD", "LTVM", "PVD", "PVM", "YVD", "YVM")),
+                 TRUE)
+
+  }
 
 })

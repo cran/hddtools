@@ -4,7 +4,8 @@
 \alias{catalogueSEPA}
 \title{Data source: SEPA catalogue}
 \usage{
-catalogueSEPA(columnName = NULL, columnValue = NULL, useCachedData = TRUE)
+catalogueSEPA(columnName = NULL, columnValue = NULL,
+  useCachedData = TRUE)
 }
 \arguments{
 \item{columnName}{name of the column to filter}
@@ -37,4 +38,3 @@ This function provides an unofficial SEPA database catalogue of river level data
 \author{
 Claudia Vitolo
 }
-

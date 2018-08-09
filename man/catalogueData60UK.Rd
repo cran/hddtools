@@ -4,8 +4,8 @@
 \alias{catalogueData60UK}
 \title{Data source: Data60UK catalogue}
 \usage{
-catalogueData60UK(areaBox = NULL, columnName = NULL, columnValue = NULL,
-  useCachedData = TRUE)
+catalogueData60UK(areaBox = NULL, columnName = NULL,
+  columnValue = NULL, useCachedData = TRUE)
 }
 \arguments{
 \item{areaBox}{bounding box, a list made of 4 elements: minimum longitude (lonMin), minimum latitude (latMin), maximum longitude (lonMax), maximum latitude (latMax)}
@@ -40,4 +40,3 @@ This function interfaces the Data60UK database catalogue (available from http://
 \author{
 Claudia Vitolo
 }
-

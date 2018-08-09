@@ -79,19 +79,6 @@ KGClimateClass(areaBox = areaBox, updatedBy = "Kottek")
 #  WolfeToneBridge <- tsGRDC(stationID = catalogueGRDC()$grdc_no[7126],
 #                            plotOption = TRUE)
 
-## ----TRMM----------------------------------------------------------------
-#  # Define a bounding box
-#  areaBox <- raster::extent(-10, 5, 48, 62)
-#  
-#  # Define a temporal extent
-#  twindow <- seq(as.Date("2012-01-01"), as.Date("2012-03-31"), by = "months")
-#  
-#  # Retreive mean monthly precipitations from 3B43_V7 (based on a bounding box and time extent)
-#  TRMMfile <- TRMM(twindow = twindow, areaBox = areaBox)
-#  
-#  library(raster)
-#  plot(TRMMfile)
-
 ## ----catalogueData60UK1, eval = TRUE-------------------------------------
 # Data60UK full catalogue
 Data60UK_catalogue_all <- catalogueData60UK()

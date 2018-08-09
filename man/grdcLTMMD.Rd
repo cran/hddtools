@@ -12,7 +12,7 @@
   \item{\code{Archive}}{url to spreadsheet}
 }}
 \source{
-\url{http://www.bafg.de/GRDC/EN/03_dtprdcts/32_LTMM/longtermmonthly_node.html}
+\url{http://www.bafg.de/GRDC}
 }
 \usage{
 data("grdcLTMMD")
@@ -21,4 +21,3 @@ data("grdcLTMMD")
 The grdcLTMMD look-up table
 }
 \keyword{datasets}
-
