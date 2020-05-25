@@ -5,13 +5,14 @@
 \title{Convert a bounding box to a SpatialPolygons object
 Bounding box is first created (in lat/lon) then projected if specified}
 \usage{
-bboxSpatialPolygon(boundingbox, proj4stringFrom = NULL,
-  proj4stringTo = NULL)
+bboxSpatialPolygon(boundingbox, proj4stringFrom = NULL, proj4stringTo = NULL)
 }
 \arguments{
-\item{boundingbox}{Bounding box: a 2x2 numerical matrix of lat/lon coordinates}
+\item{boundingbox}{Bounding box: a 2x2 numerical matrix of lat/lon
+coordinates}
 
-\item{proj4stringFrom}{Projection string for the current boundingbox coordinates (defaults to lat/lon, WGS84)}
+\item{proj4stringFrom}{Projection string for the current boundingbox
+coordinates (defaults to lat/lon, WGS84)}
 
 \item{proj4stringTo}{Projection string, or NULL to not project}
 }
@@ -30,5 +31,5 @@ Bounding box is first created (in lat/lon) then projected if specified
 
 }
 \references{
-\url{http://gis.stackexchange.com/questions/46954/clip-spatial-object-to-bounding-box-in-r}
+\url{https://bit.ly/2NA5PSF}
 }

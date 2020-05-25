@@ -4,38 +4,21 @@
 \alias{catalogueGRDC}
 \title{Data source: Global Runoff Data Centre catalogue}
 \usage{
-catalogueGRDC(areaBox = NULL, columnName = NULL, columnValue = NULL,
-  useCachedData = TRUE)
-}
-\arguments{
-\item{areaBox}{bounding box, a list made of 4 elements: minimum longitude
-(lonMin), minimum latitude (latMin), maximum longitude (lonMax), maximum
-latitude (latMax)}
-
-\item{columnName}{name of the column to filter}
-
-\item{columnValue}{value to look for in the column named columnName}
-
-\item{useCachedData}{logical, set to TRUE to use cached data, set to FALSE to
-retrive data from online source. This is TRUE by default.}
+catalogueGRDC()
 }
 \value{
-This function returns a data frame made of 9481 rows (gauging
-stations, as per October 2017) and 26 columns:
+This function returns a data frame made with the following columns:
 \itemize{
   \item{\code{grdc_no}}{: GRDC station number}
   \item{\code{wmo_reg}}{: WMO region}
   \item{\code{sub_reg}}{: WMO subregion}
-  \item{\code{nat_id}}{: national station ID}
   \item{\code{river}}{: river name}
   \item{\code{station}}{: station name}
-  \item{\code{country_code}}{: country code (ISO 3166)}
+  \item{\code{country}}{: 2-letter country code (ISO 3166)}
   \item{\code{lat}}{: latitude, decimal degree}
   \item{\code{long}}{: longitude, decimal degree}
   \item{\code{area}}{: catchment size, km2}
   \item{\code{altitude}}{: height of gauge zero, m above sea level}
-  \item{\code{ds_stat_no}}{: GRDC station number of next downstream GRDC
-  station}
   \item{\code{d_start}}{: daily data available from year}
   \item{\code{d_end}}{: daily data available until year}
   \item{\code{d_yrs}}{: length of time series, daily data}
@@ -55,25 +38,12 @@ stations, as per October 2017) and 26 columns:
 }
 \description{
 This function interfaces the Global Runoff Data Centre database
-which provides river discharge data for about 9000 sites over 157 countries.
+which provides river discharge data for almost 1000 sites over 157 countries.
 }
 \examples{
 \dontrun{
-  # Retrieve the whole catalogue
+  # Retrieve the catalogue
   GRDC_catalogue_all <- catalogueGRDC()
-
-  # Define a bounding box
-  areaBox <- raster::extent(-3.82, -3.63, 52.41, 52.52)
-  # Filter the catalogue based on bounding box
-  GRDC_catalogue_bbox <- catalogueGRDC(areaBox = areaBox)
-
-  # Get only catchments with area above 5000 Km2
-  GRDC_catalogue_area <- catalogueGRDC(columnName = "area",
-                                       columnValue = ">= 5000")
-
-  # Get only catchments within river Thames
-  GRDC_catalogue_river <- catalogueGRDC(columnName = "river",
-                                        columnValue = "Thames")
 }
 
 }
