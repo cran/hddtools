@@ -126,30 +126,30 @@ MorwickTS <- tsData60UK(id)
 #       xlab = "",
 #       ylab = c("P [mm/day]","E [mm/day]", "Q [mm/day]", "Tmax [C]","Tmin [C]"))
 
-## ----SEPA1, eval = TRUE-------------------------------------------------------
-# SEPA catalogue
-SEPA_catalogue <- catalogueSEPA()
+## ----SEPA1, eval = FALSE------------------------------------------------------
+#  # SEPA catalogue
+#  SEPA_catalogue <- catalogueSEPA()
 
-## ----SEPA2, eval = TRUE, message = FALSE, fig.width = 7-----------------------
-# Take the first record in the catalogue
-Perth_metadata <- SEPA_catalogue[1,]
-
-# Single time series extraction
-Perth_ts <- tsSEPA(id = Perth_metadata$LOCATION_CODE)
-
-# Plot
-plot(Perth_ts,
-     main = Perth_metadata$STATION_NAME,
-     xlab = "",
-     ylab = "Water level [m]")
-
-# Get only catchments with area above 4000 Km2
-SEPA_catalogue %>%
-  filter(CATCHMENT_AREA >= 4000)
-
-# Get only catchments within river Ayr
-SEPA_catalogue %>%
-  filter(RIVER_NAME == "Ayr")
+## ----SEPA2, eval = FALSE, message = FALSE, fig.width = 7----------------------
+#  # Take the first record in the catalogue
+#  Perth_metadata <- SEPA_catalogue[1,]
+#  
+#  # Single time series extraction
+#  Perth_ts <- tsSEPA(id = Perth_metadata$LOCATION_CODE)
+#  
+#  # Plot
+#  plot(Perth_ts,
+#       main = Perth_metadata$STATION_NAME,
+#       xlab = "",
+#       ylab = "Water level [m]")
+#  
+#  # Get only catchments with area above 4000 Km2
+#  SEPA_catalogue %>%
+#    filter(CATCHMENT_AREA >= 4000)
+#  
+#  # Get only catchments within river Ayr
+#  SEPA_catalogue %>%
+#    filter(RIVER_NAME == "Ayr")
 
 ## ----SEPA3, eval=FALSE, message = FALSE, fig.width = 7------------------------
 #  # Multiple time series extraction
