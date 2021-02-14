@@ -1,7 +1,11 @@
+# hddtools 0.9.4
+
+* Removed dependency from the rnrfa package
+
 # hddtools 0.9.3
 
 * Updated URLs
-* Tests now skipped if source is temporarily unavailable
+* SEPA tests now skipped if source is temporarily unavailable
 
 # hddtools 0.9.0
 
